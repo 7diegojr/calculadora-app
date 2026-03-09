@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import CalcButton from "./components/CalcButton";
 import Display from "./components/Display";
@@ -7,8 +8,15 @@ import { themes } from "./theme/token";
 import { createEngine } from "./utils/calcEngine";
 
 export default function App() {
-  const [mode, setMode] = useState("light");
+  const [mode, setMode] = useState("dark");
   const theme = themes[mode];
+
+  const engine = useMemo(() => createEngine({ locale: "pt-BR" }), []);
+  const [state, setState] = useState(engine.initialState());
+
+  function onKey(key) {
+    setState((prev) => engine.reduce(prev, key));
+  }
 
   return (
     <View style={[styles.container, { backgroundColor : theme.bg }]}>
@@ -26,8 +34,8 @@ export default function App() {
             }
           ]}
         >
-        <Text style={{color: theme.text, fontWeight: "700"}}>
-          {mode === "dark" ? "Dark" : "Light"}
+        <Text style={{color: theme.text,}}>
+          {mode === "dark" ? <MaterialIcons name="dark-mode" size={30} color="#8113ee" /> : <MaterialIcons name="light-mode" size={30} color="#8113ee" />}
         </Text>
         </Pressable>
 
@@ -35,48 +43,48 @@ export default function App() {
 
       <Display 
         theme={theme}
-        expression={"100 + "}
-        value={0}
+        expression={state.expression}
+        value={state.display}
       />
 
       <View style={styles.pad}>
         {/* Linha1 1 */}
         <View style={styles.row}>
-          <CalcButton theme={theme} label="C" variant="neutral" onPress={() => {}} />
-          <CalcButton theme={theme} label="+/-" variant="neutral" onPress={() => {}} />
-          <CalcButton theme={theme} label="%" variant="neutral" onPress={() => {}} />
-          <CalcButton theme={theme} label="÷" variant="op" onPress={() => {}} />
+          <CalcButton theme={theme} label="C" variant="neutral" onPress={() => onKey("C")} />
+          <CalcButton theme={theme} label="+/-" variant="neutral" onPress={() => onKey("SIGN")} />
+          <CalcButton theme={theme} label="%" variant="neutral" onPress={() => onKey("%")} />
+          <CalcButton theme={theme} label="÷" variant="op" onPress={() => onKey("/")} />
         </View>
 
         {/* Linha1 2 */}
         <View style={styles.row}>
-          <CalcButton theme={theme} label="7" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="8" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="9" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="x" variant="op" onPress={() => {}} />
+          <CalcButton theme={theme} label="7" variant="num" onPress={() => onKey("7")} />
+          <CalcButton theme={theme} label="8" variant="num" onPress={() => onKey("8")} />
+          <CalcButton theme={theme} label="9" variant="num" onPress={() => onKey("9")} />
+          <CalcButton theme={theme} label="x" variant="op" onPress={() => onKey("*")} />
         </View>
         
         {/* Linha1 3 */}
         <View style={styles.row}>
-          <CalcButton theme={theme} label="4" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="5" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="6" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="-" variant="op" onPress={() => {}} />
+          <CalcButton theme={theme} label="4" variant="num" onPress={() => onKey("4")} />
+          <CalcButton theme={theme} label="5" variant="num" onPress={() => onKey("5")} />
+          <CalcButton theme={theme} label="6" variant="num" onPress={() => onKey("6")} />
+          <CalcButton theme={theme} label="-" variant="op" onPress={() => onKey("-")} />
         </View>
 
         {/* Linha1 4 */}
         <View style={styles.row}>
-          <CalcButton theme={theme} label="1" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="2" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="3" variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="+" variant="op" onPress={() => {}} />
+          <CalcButton theme={theme} label="1" variant="num" onPress={() => onKey("1")} />
+          <CalcButton theme={theme} label="2" variant="num" onPress={() => onKey("2")} />
+          <CalcButton theme={theme} label="3" variant="num" onPress={() => onKey("3")} />
+          <CalcButton theme={theme} label="+" variant="op" onPress={() => onKey("+")} />
         </View>
 
         {/* Linha1 5 */}
         <View style={styles.row}>
-          <CalcButton theme={theme} label="0" variant="num" wide onPress={() => {}} />
-          <CalcButton theme={theme} label="." variant="num" onPress={() => {}} />
-          <CalcButton theme={theme} label="=" variant="op" onPress={() => {}} />
+          <CalcButton theme={theme} label="0" variant="num" wide onPress={() => onKey("0")} />
+          <CalcButton theme={theme} label="." variant="num" onPress={() => onKey(".")} />
+          <CalcButton theme={theme} label="=" variant="op" onPress={() => onKey("=")} />
         </View>
 
       </View>
@@ -92,9 +100,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingTop: 40,
   },
-  topbar: {
-    alignItems: 'flex-end',
+  topBar: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#202124',
+    borderRadius: '50%',
     marginBottom: 6,
+    paddingTop: '4px',
+    width: '50px',
+    height: '50px',
   },
   toggle: {
     paddingHorizontal: 14,
